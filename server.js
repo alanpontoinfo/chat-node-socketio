@@ -38,7 +38,8 @@ console.log("Databse conected");
       res.render('pug', {
         title: 'Connected to Database',
         message: 'Please login',
-        showLogin: true 
+        showLogin: true ,
+        showRegistration: true
       });
     }); 
    
