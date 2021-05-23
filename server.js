@@ -8,6 +8,8 @@ const session = require('express-session');
 const passport = require('passport');
 const app = express();
 
+app.set('view engine', 'pug');
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
@@ -15,8 +17,24 @@ app.use(session({
   cookie: { secure: false }
 }));
 
+
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+ myDB(async client => {
+    const myDataBase = await client.db('database').collection('users');
+console.log("Databse conected");
+    app.route('/').get((req, res) => {
+      //Change the response to render the Pug template
+      res.render('pug', {
+        title: 'Connected to Database',
+        message: 'Please login'
+      });
+    });
+    
+    
 
 passport.serializeUser((user, done)=>{
   done(null, user._id);
@@ -28,7 +46,14 @@ passport.deserializeUser((id,  done)=>{
   });
 });
 
-app.set('view engine', 'pug');
+}).catch(e => {
+  console.log("connection database fail!");
+  app.route('/').get((req, res) => {
+    res.render('pug', { title: e, message: 'Unable to login' });
+  });
+});
+
+
 
 fccTesting(app); //For FCC testing purposes
 app.use('/public', express.static(process.cwd() + '/public'));
