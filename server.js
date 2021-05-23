@@ -47,6 +47,13 @@ console.log("Databse conected");
           res.redirect('/profile');
         });
       
+        function ensureAuthenticated(req, res, next) {
+          if (req.isAuthenticated()) {
+            return next();
+          }
+          res.redirect('/');
+        };
+        
         app.route('/profile').get((req, res) => {
           res.render(process.cwd() + '/views/pug/profile');
         });
