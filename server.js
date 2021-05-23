@@ -19,8 +19,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser((user, done)=>{
-  done(null, user_id);
+  done(null, user._id);
 });
+
 passport.deserializeUser((id,  done)=>{
   myDB.findOne({_id: new ObjectID(id)}, (err,doc)=>{
     done(null, null);
