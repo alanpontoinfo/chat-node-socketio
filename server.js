@@ -37,10 +37,20 @@ console.log("Databse conected");
       //Change the response to render the Pug template
       res.render('pug', {
         title: 'Connected to Database',
-        message: 'Please login'
+        message: 'Please login',
+        showLogin: true 
       });
-    });
-    
+    }); 
+   
+  
+         app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+          res.redirect('/profile');
+        });
+      
+        app.route('/profile').get((req, res) => {
+          res.render(process.cwd() + '/views/pug/profile');
+        });
+      
     
     
 
@@ -64,6 +74,7 @@ passport.use(new LocalStrategy(
     });
   }
 ));
+
 }).catch(e => {
   console.log("connection database fail!");
   app.route('/').get((req, res) => {
