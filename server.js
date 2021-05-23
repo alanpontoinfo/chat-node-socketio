@@ -7,6 +7,7 @@ const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const session = require('express-session');
 const passport = require('passport');
 const app = express();
+const LocalStrategy = require('passport-local');
 
 app.set('view engine', 'pug');
 
@@ -52,7 +53,17 @@ passport.deserializeUser((id,  done)=>{
     done(null, doc);
   });
 });
-
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    myDataBase.findOne({ username: username }, function (err, user) {
+      console.log('User '+ username +' attempted to log in.');
+      if (err) { return done(err); }
+      if (!user) { return done(null, false); }
+      if (password !== user.password) { return done(null, false); }
+      return done(null, user);
+    });
+  }
+));
 }).catch(e => {
   console.log("connection database fail!");
   app.route('/').get((req, res) => {
