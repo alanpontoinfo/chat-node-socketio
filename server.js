@@ -35,14 +35,15 @@ console.log("Databse conected");
     });
     
     
+    
 
 passport.serializeUser((user, done)=>{
   done(null, user._id);
 });
 
 passport.deserializeUser((id,  done)=>{
-  myDB.findOne({_id: new ObjectID(id)}, (err,doc)=>{
-    done(null, null);
+  myDataBase.findOne({_id: new ObjectID(id)}, (err,doc)=>{
+    done(null, doc);
   });
 });
 
