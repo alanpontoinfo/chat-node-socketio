@@ -2,6 +2,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const bcrypt = require('bcrypt');
 const ObjectID = require('mongodb').ObjectID;
+const GitHubStrategy = require('passport-github').Strategy;
 
 module.exports = function (app, myDataBase) {
   passport.serializeUser((user, done) => {
@@ -29,6 +30,15 @@ module.exports = function (app, myDataBase) {
   ));
 
 
-
-  
+  passport.use(new GitHubStrategy({
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: 'https://fast-savannah-89240.herokuapp.com/auth/github/callback'
+  },
+    function (accessToken, refreshToken, profile, cb) {
+      console.log(profile);
+      // Database logic here with callback containing our user object
+    }
+  ));
 };
+  
