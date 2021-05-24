@@ -8,6 +8,7 @@ const session = require('express-session');
 const passport = require('passport');
 const app = express();
 const LocalStrategy = require('passport-local');
+const bcrypt = require('bcrypt');
 
 app.set('view engine', 'pug');
 
@@ -31,7 +32,7 @@ app.use(passport.session());
 
 
  myDB(async client => {
-    const myDataBase = await client.db('database').collection('users');
+const myDataBase = await client.db('database').collection('users');
 console.log("Databse conected");
     app.route('/').get((req, res) => {
       //Change the response to render the Pug template
@@ -44,10 +45,12 @@ console.log("Databse conected");
     }); 
    
   
-        
+    app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+      res.redirect('/profile');
+    });      
 
 
-        app.route('/profile').get(ensureAuthenticated, (req, res) => {
+ app.route('/profile').get(ensureAuthenticated, (req, res) => {
           res.render(process.cwd() + '/views/pug/profile', { username: req.user.username });
         });
       
@@ -59,13 +62,14 @@ console.log("Databse conected");
       });
       app.route('/register').post(
         (req, res, next) => {
+          const hash = bcrypt.hashSync(req.body.password, 12);
           myDataBase.findOne({ username: req.body.username }, function (err, user) {
             if (err) {
               next(err);
             } else if (user) {
               res.redirect('/');
             } else {
-              myDataBase.insertOne({ username: req.body.username, password: req.body.password }, (err, doc) => {
+              myDataBase.insertOne({ username: req.body.username, password: hash }, (err, doc) => {
                 if (err) {
                   res.redirect('/');
                 } else {
@@ -75,7 +79,8 @@ console.log("Databse conected");
             }
           });
         },
-        passport.authenticate('local', { failureRedirect: '/' }),
+
+passport.authenticate('local', { failureRedirect: '/' }),
         (req, res, next) => {
           res.redirect('/profile');
         }
@@ -103,7 +108,10 @@ passport.use(new LocalStrategy(
       console.log('User '+ username +' attempted to log in.');
       if (err) { return done(err); }
       if (!user) { return done(null, false); }
-      if (password !== user.password) { return done(null, false); }
+      if (!bcrypt.compareSync(password, user.password)) { 
+        return done(null, false);
+      }
+ 
       return done(null, user);
     });
   }
