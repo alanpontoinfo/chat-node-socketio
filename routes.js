@@ -13,6 +13,10 @@ module.exports = function (app, myDataBase) {
   app.route('/profile').get(ensureAuthenticated, (req, res) => {
     res.render('pug/profile', { username: req.user.username });
   });
+ 
+ app.route('/chat').get(ensureAuthenticated, (req, res) =>{
+     res.render('/pug/chat', { user: req.user});
+ })
   app.route('/logout').get((req, res) => {
     req.logout();
     res.redirect('/');
@@ -42,14 +46,11 @@ module.exports = function (app, myDataBase) {
     }
   );
 
-  /*app.route('/login')
-  .post(passport.authenticate('local', { failureRedirect: '/' }), (req,res) => {
-    res.redirect('/profile');
-  })*/
   app.route('/auth/github').get(passport.authenticate('github'));
   app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
     res.redirect('/profile');
   });
+ 
   app.use((req, res, next) => {
     res.status(404).type('text').send('Not Found');
   });

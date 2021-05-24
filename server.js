@@ -9,6 +9,9 @@ const routes = require('./routes.js');
 const auth = require('./auth.js');
 
 const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
 app.set('view engine', 'pug');
 
 fccTesting(app); // For fCC testing purposes
@@ -32,6 +35,10 @@ myDB(async (client) => {
 
   routes(app, myDataBase);
   auth(app, myDataBase);
+
+  io.on('connection', (socket) =>{
+    console.log('A user has connected');
+  });
 }).catch((e) => {
   app.route('/').get((req, res) => {
     res.render('pug', { title: e, message: 'Unable to login' });
