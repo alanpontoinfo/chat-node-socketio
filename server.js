@@ -15,7 +15,7 @@ let passportSocketIo = require('passport.socketio');
 const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo');
 const URI = process.env.MONGO_URI;
-//const store = new MongoStore();
+const store = MongoStore.create({mongoUrl: URI});
 
 app.set('view engine', 'pug');
 
@@ -31,7 +31,7 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false },
   key: 'express.sid',
-  store: MongoStore.create({mongoUrl: URI})
+  store: store
 }));
 
 app.use(passport.initialize());
@@ -42,7 +42,7 @@ io.use(
     cookieParser: cookieParser,
     key: 'express.sid',
     secret: process.env.SESSION_SECRET,
-    store: MongoStore.create({mongoUrl: URI}),
+    store: store,
     success: onAuthorizeSuccess,
     fail: onAuthorizeFail
   })
