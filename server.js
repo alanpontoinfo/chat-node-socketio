@@ -13,10 +13,10 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 let passportSocketIo = require('passport.socketio');
 const cookieParser = require('cookie-parser');
-const MongoStore = require('mongodb').session;
+const MongoStore = require('connect-mongo');
 const URI = process.env.MONGO_URI;
 //const store = new MongoStore();
-const sessionStore = new session.MemoryStore(new MongoStore({url: URI}));
+
 app.set('view engine', 'pug');
 
 fccTesting(app); //For FCC testing purposes
@@ -24,13 +24,14 @@ app.use('/public', express.static(process.cwd() + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
   saveUninitialized: true,
   cookie: { secure: false },
   key: 'express.sid',
-  store: sessionStore
+  store: MongoStore.create({mongoUrl: URI})
 }));
 
 app.use(passport.initialize());
@@ -41,7 +42,7 @@ io.use(
     cookieParser: cookieParser,
     key: 'express.sid',
     secret: process.env.SESSION_SECRET,
-    store: sessionStore,
+    store: MongoStore.create({mongoUrl: URI}),
     success: onAuthorizeSuccess,
     fail: onAuthorizeFail
   })

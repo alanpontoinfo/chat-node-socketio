@@ -5,7 +5,7 @@ $(document).ready(function () {
 
  socket.on('user',  (data)=>{
    $('#num-users').text(data.currentUsers + ' user online');
-   let message =data.name + (data.connected ? 'has joined the chat.': ' has left the chat');
+   let message = data.name + (data.connected ? 'has joined the chat.': ' has left the chat');
    $('#messages').append($('<li>').html('<b>' + message + '</b>'));
    console.log(data);
  });
