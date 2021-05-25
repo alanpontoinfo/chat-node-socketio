@@ -9,7 +9,10 @@ $(document).ready(function () {
    $('#messages').append($('<li>').html('<b>' + message + '</b>'));
    console.log(data);
  });
-
+socket.on('chat message', (data)=>{
+  console.log('socket.on 1');
+  $('#messages').append($('<li>'.text(`${data.name}:${data.message}`)));
+});
   $('form').submit(function () {
     var messageToSend = $('#m').val();
 
